@@ -21,9 +21,9 @@ class SpecialMomentDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: "string", format: "binary" }) // Indica que será um arquivo
   @IsNotEmpty()
-  photo: string;
+  photoFile?: any; // Aceita o arquivo
 }
 
 export class CreateStoryDto {
@@ -53,8 +53,8 @@ export class CreateStoryDto {
   selectedPlan: string;
 
   @ApiProperty()
-  @ValidateNested({ each: true })
-  @Type(() => SpecialMomentDto)
+  // @ValidateNested({ each: true })
+  // @Type(() => SpecialMomentDto)
   specialMoments: SpecialMomentDto[];
 
   @ApiProperty()

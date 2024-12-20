@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateStoryDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 class SpecialMomentDto {
 }
@@ -31,10 +30,10 @@ __decorate([
     __metadata("design:type", String)
 ], SpecialMomentDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ type: "string", format: "binary" }),
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], SpecialMomentDto.prototype, "photo", void 0);
+    __metadata("design:type", Object)
+], SpecialMomentDto.prototype, "photoFile", void 0);
 class CreateStoryDto {
 }
 exports.CreateStoryDto = CreateStoryDto;
@@ -70,8 +69,6 @@ __decorate([
 ], CreateStoryDto.prototype, "selectedPlan", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    (0, class_validator_1.ValidateNested)({ each: true }),
-    (0, class_transformer_1.Type)(() => SpecialMomentDto),
     __metadata("design:type", Array)
 ], CreateStoryDto.prototype, "specialMoments", void 0);
 __decorate([

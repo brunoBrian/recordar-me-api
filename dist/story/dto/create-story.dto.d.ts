@@ -2,7 +2,7 @@ declare class SpecialMomentDto {
     title: string;
     date: string;
     description: string;
-    photo: string;
+    photoFile?: any;
 }
 export declare class CreateStoryDto {
     coupleName: string;

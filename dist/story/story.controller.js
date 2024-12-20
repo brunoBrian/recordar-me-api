@@ -15,31 +15,42 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoryController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
-const story_service_1 = require("./story.service");
 const create_story_dto_1 = require("./dto/create-story.dto");
 const swagger_1 = require("@nestjs/swagger");
+const story_service_1 = require("./story.service");
 let StoryController = class StoryController {
     constructor(storyService) {
         this.storyService = storyService;
     }
     async createStory(createStoryDto, files) {
-        const storyImages = files.storyImages?.map((file) => file.filename);
-        console.log(files.storyImages);
+        const specialMoments = createStoryDto.specialMoments.map((moment, index) => {
+            const parseMoment = JSON.parse(moment);
+            return {
+                id: parseMoment.id,
+                title: parseMoment.title,
+                date: parseMoment.date,
+                description: parseMoment.id,
+                photoFile: files[`specialMoments[${index}][photoFile]`]?.[0],
+            };
+        });
         const payload = {
             ...createStoryDto,
             storyImages: files.storyImages,
+            specialMoments,
         };
         return this.storyService.createStory(payload);
-    }
-    async getStory(uuid) {
-        return this.storyService.getStory(uuid);
     }
 };
 exports.StoryController = StoryController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
-        { name: "storyImages", maxCount: 10 },
+        { name: "storyImages", maxCount: 5 },
+        { name: "specialMoments[0][photoFile]", maxCount: 1 },
+        { name: "specialMoments[1][photoFile]", maxCount: 1 },
+        { name: "specialMoments[2][photoFile]", maxCount: 1 },
+        { name: "specialMoments[3][photoFile]", maxCount: 1 },
+        { name: "specialMoments[4][photoFile]", maxCount: 1 },
     ])),
     (0, swagger_1.ApiOperation)({ summary: "Create a new story with images" }),
     __param(0, (0, common_1.Body)()),
@@ -48,14 +59,6 @@ __decorate([
     __metadata("design:paramtypes", [create_story_dto_1.CreateStoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], StoryController.prototype, "createStory", null);
-__decorate([
-    (0, common_1.Get)(":uuid"),
-    (0, swagger_1.ApiOperation)({ summary: "Get story by UUID" }),
-    __param(0, (0, common_1.Param)("uuid")),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], StoryController.prototype, "getStory", null);
 exports.StoryController = StoryController = __decorate([
     (0, swagger_1.ApiTags)("stories"),
     (0, common_1.Controller)("story"),
