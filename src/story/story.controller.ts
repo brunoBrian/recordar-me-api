@@ -4,6 +4,8 @@ import {
   Body,
   UploadedFiles,
   UseInterceptors,
+  Get,
+  Param,
 } from "@nestjs/common";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { CreateStoryDto } from "./dto/create-story.dto";
@@ -29,21 +31,19 @@ export class StoryController {
   @ApiOperation({ summary: "Create a new story with images" })
   async createStory(
     @Body() createStoryDto: CreateStoryDto,
-    @UploadedFiles() files: Record<string, any[]>
+    @UploadedFiles() files: Record<string, File[]>
   ) {
-    // Os arquivos de `specialMoments` serão recebidos como:
-    // files["specialMoments[0][photoFile]"] ou files["specialMoments[1][photoFile]"]
-
     // Lógica para mapear arquivos aos momentos
-    const specialMoments = createStoryDto.specialMoments.map(
+    const specialMoments = createStoryDto?.specialMoments?.map(
       (moment, index) => {
-        const parseMoment = JSON.parse(moment as unknown as string);
+        const parseMoment =
+          typeof moment === "string" ? JSON.parse(moment) : moment;
 
         return {
           id: parseMoment.id,
           title: parseMoment.title,
           date: parseMoment.date,
-          description: parseMoment.id,
+          description: parseMoment.description,
           photoFile: files[`specialMoments[${index}][photoFile]`]?.[0], // Associa o arquivo ao momento
         };
       }
@@ -56,5 +56,11 @@ export class StoryController {
     };
 
     return this.storyService.createStory(payload);
+  }
+
+  @Get(":uuid")
+  @ApiOperation({ summary: "Get story by UUID" })
+  async getStory(@Param("uuid") uuid: string) {
+    return this.storyService.getStory(uuid);
   }
 }

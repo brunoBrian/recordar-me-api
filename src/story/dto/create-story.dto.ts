@@ -53,17 +53,21 @@ export class CreateStoryDto {
   selectedPlan: string;
 
   @ApiProperty()
-  // @ValidateNested({ each: true })
-  // @Type(() => SpecialMomentDto)
-  specialMoments: SpecialMomentDto[];
-
-  @ApiProperty()
   @IsOptional()
   youtubeUrl: string;
 
+  @ApiProperty({
+    type: "string",
+    format: "binary",
+    required: false,
+    isArray: true,
+  })
+  storyImages?: any[];
+
+  @ApiProperty({ type: [SpecialMomentDto], required: false })
+  specialMoments?: SpecialMomentDto[];
+
   @ApiProperty()
   @IsOptional()
-  // @IsArray()
-  // @IsString({ each: true })
-  storyImages: any;
+  animation: string;
 }

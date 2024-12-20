@@ -11,26 +11,28 @@ export class StoryService {
     private readonly storageService: StorageService
   ) {}
 
-  async createStory(createStoryDto: any) {
+  async createStory(createStoryDto: CreateStoryDto) {
     const uuid = uuidv4();
     const imageUrls = await Promise.all(
-      createStoryDto.storyImages.map((image) =>
+      createStoryDto?.storyImages?.map((image) =>
         this.storageService.uploadFile(image)
       )
     );
 
-    const specialMomentsWithUrls = await Promise.all(
-      createStoryDto.specialMoments.map(async (moment) => {
-        const uploadedPhotoUrl = moment.photoFile
-          ? await this.storageService.uploadFile(moment.photoFile)
-          : null;
+    const specialMomentsWithUrls = createStoryDto.specialMoments
+      ? await Promise.all(
+          createStoryDto.specialMoments.map(async (moment) => {
+            const uploadedPhotoUrl = moment.photoFile
+              ? await this.storageService.uploadFile(moment.photoFile)
+              : null;
 
-        return {
-          ...moment,
-          photoFile: uploadedPhotoUrl,
-        };
-      })
-    );
+            return {
+              ...moment,
+              photo: uploadedPhotoUrl,
+            };
+          })
+        )
+      : [];
 
     const storyData = {
       ...createStoryDto,
@@ -45,8 +47,6 @@ export class StoryService {
   }
 
   async getStory(uuid: string) {
-    console.log(await this.firebaseService.get("stories", uuid));
-
     const story = await this.firebaseService.get("stories", uuid);
 
     return story
