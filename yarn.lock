@@ -5459,6 +5459,14 @@ memfs@^3.4.1:
   dependencies:
     fs-monkey "^1.0.4"
 
+mercadopago@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/mercadopago/-/mercadopago-2.1.0.tgz#76bad13254e6b27fcd14f3a5bba1c13cf3183d1b"
+  integrity sha512-3Kx5AAPWEPnO9aSHhbAYPIYpKjM2QtyUJ/mEuBA0AeD19Mt8KViAN3vKqaZCxtEFgeiw+388m0HeBTOEGxU/7w==
+  dependencies:
+    node-fetch "^2.6.12"
+    uuid "^9.0.0"
+
 merge-descriptors@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.3.tgz#d80319a65f3c7935351e5cfdac8f9318504dbed5"
@@ -5629,7 +5637,7 @@ node-emoji@1.11.0:
   dependencies:
     lodash "^4.17.21"
 
-node-fetch@^2.6.1, node-fetch@^2.6.9:
+node-fetch@^2.6.1, node-fetch@^2.6.12, node-fetch@^2.6.9:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==

@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import {
   IsArray,
+  IsEmail,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -70,4 +71,12 @@ export class CreateStoryDto {
   @ApiProperty()
   @IsOptional()
   animation: string;
+
+  @ApiProperty()
+  @IsEmail()
+  email: string;
+
+  @ApiProperty()
+  @IsString()
+  phone: string;
 }
