@@ -36,6 +36,8 @@ export class PaymentController {
         const paymentDetails =
           await this.paymentService.getPaymentDetails(paymentId);
 
+        console.log("paymentDetails:", paymentDetails);
+
         if (paymentDetails.status === "approved") {
           // Extract payment details
           const email = paymentDetails.payer.email;
