@@ -9,11 +9,15 @@ import {
 import { PaymentService } from "./payment.service";
 import { CreatePixPaymentDto } from "./dto/create-pix-payment.dto";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
+import { EmailService } from "src/shared/services/email.service";
 
 @ApiTags("payments")
 @Controller("pagamento")
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(
+    private readonly paymentService: PaymentService,
+    private readonly emailService: EmailService
+  ) {}
 
   @Post("pix")
   @ApiOperation({ summary: "Generate PIX payment QR Code" })
@@ -36,9 +40,7 @@ export class PaymentController {
         const paymentDetails =
           await this.paymentService.getPaymentDetails(paymentId);
 
-        console.log("paymentDetails:", paymentDetails);
-
-        if (paymentDetails.status === "approved") {
+        if (paymentDetails.status === "pending") {
           // Extract payment details
           const email = paymentDetails.payer.email;
           const amount = paymentDetails.transaction_amount;
@@ -47,7 +49,7 @@ export class PaymentController {
           const link = `https://lovezin-three.vercel.app/nossa-historia/${external_reference}`;
 
           // Send payment confirmation email
-          // await this.emailService.sendPaymentConfirmation(email, amount, uuid);
+          await this.emailService.sendPaymentConfirmation(email, amount, link);
 
           console.log(`Payment approved and email sent to ${email} - ${link}`);
         }
