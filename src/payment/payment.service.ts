@@ -52,15 +52,15 @@ export class PaymentService {
   }
 
   async getPaymentDetails(paymentId: string) {
-    const mercadopago = require("mercadopago");
-    mercadopago.configure({
+    const client = new MercadoPagoConfig({
       accessToken:
         "TEST-4040709112330075-122015-a86226fe016fc8bcc2317edd45d21a1b-223439510",
     });
+    const payment = new Payment(client);
 
     try {
-      const response = await mercadopago.payment.get(paymentId);
-      return response.body;
+      const response = await payment.get({ id: paymentId });
+      return response;
     } catch (error) {
       console.error("Error fetching payment details:", error);
       throw new Error("Error fetching payment details");
