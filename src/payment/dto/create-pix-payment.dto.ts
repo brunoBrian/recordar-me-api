@@ -16,4 +16,9 @@ export class CreatePixPaymentDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  uuid: string;
 }

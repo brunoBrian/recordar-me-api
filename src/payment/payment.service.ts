@@ -37,6 +37,7 @@ export class PaymentService {
           transaction_amount: data.amount,
           description: data.description,
           payment_method_id: "pix",
+          external_reference: data.uuid,
           payer: {
             email: data.email,
           },

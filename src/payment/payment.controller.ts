@@ -23,6 +23,8 @@ export class PaymentController {
 
   @Post("pix/webhook")
   async handleMercadoPagoNotification(@Body() body: any, @Res() res: any) {
+    const { external_reference, status } = body.data;
+
     try {
       console.log("Webhook received:", body);
 
@@ -40,10 +42,12 @@ export class PaymentController {
           const amount = paymentDetails.transaction_amount;
           const uuid = paymentDetails.id;
 
+          const link = `https://lovezin-three.vercel.app/nossa-historia/${external_reference}`;
+
           // Send payment confirmation email
           // await this.emailService.sendPaymentConfirmation(email, amount, uuid);
 
-          console.log(`Payment approved and email sent to ${email}`);
+          console.log(`Payment approved and email sent to ${email} - ${link}`);
         }
       }
 
