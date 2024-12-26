@@ -36,9 +36,14 @@ export class PaymentController {
       if (body.type === "payment") {
         const paymentId = body.id;
 
+        console.log("paymentId", paymentId);
+        console.log("external_reference", external_reference);
+
         // Fetch payment details from Mercado Pago
         const paymentDetails =
           await this.paymentService.getPaymentDetails(paymentId);
+
+        console.log("paymentDetails", paymentDetails);
 
         if (paymentDetails.status === "pending") {
           // Extract payment details
