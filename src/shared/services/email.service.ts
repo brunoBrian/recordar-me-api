@@ -7,10 +7,12 @@ export class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       auth: {
         user: "recordar.me.oficial@gmail.com",
-        pass: "Cabelera@10",
+        pass: "gonl yjhf ktiy axlg",
       },
     });
   }
@@ -26,13 +28,24 @@ export class EmailService {
     await this.transporter.sendMail({
       from: process.env.SMTP_FROM,
       to: email,
-      subject: "Payment Confirmation",
+      subject: "🎉 Confirmação de Pagamento Recebido!",
       html: `
-        <h1>Payment Confirmed!</h1>
-        <p>Your payment of R$ ${amount.toFixed(2)} has been confirmed.</p>
-        <p>Thank you for your purchase!</p>
-
-        <a href="${link}">View your purchase</a>
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h1 style="color: #4f212f; text-align: center;">Pagamento Confirmado! 🎉</h1>
+          <p>Olá,</p>
+          <p>Estamos felizes em informar que recebemos seu pagamento no valor de <strong>R$ ${amount.toFixed(
+            2
+          )}</strong>.</p>
+          <p>Muito obrigado por escolher nossos serviços! Você já pode acessar seu link clicando no botão abaixo:</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${link}" style="background-color: #4f212f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+              Link com sua história
+            </a>
+          </div>
+          <p>Se tiver alguma dúvida, estamos à disposição para ajudar.</p>
+          <p>Atenciosamente,</p>
+          <p><strong>Recordar.me</strong></p>
+        </div>
       `,
     });
   }
