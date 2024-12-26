@@ -27,37 +27,45 @@ export class PaymentController {
 
   @Post("pix/webhook")
   async handleMercadoPagoNotification(@Body() body: any, @Res() res: any) {
-    const { external_reference, status } = body.data;
-
     try {
       console.log("Webhook received:", body);
 
-      console.log("external_reference", external_reference);
-
-      // Check if the notification is about a payment
-      if (body.type === "payment") {
+      // Verifica se o tipo da notificação é 'payment'
+      if (body.type === "payment" && body.data?.id) {
         const paymentId = body.data.id;
 
-        // Fetch payment details from Mercado Pago
+        console.log("Fetching payment details for ID:", paymentId);
+
+        // Busca os detalhes do pagamento
         const paymentDetails =
           await this.paymentService.getPaymentDetails(paymentId);
 
-        if (paymentDetails.status === "pending") {
-          // Extract payment details
-          const email = paymentDetails.payer.email;
-          const amount = paymentDetails.transaction_amount;
-          const uuid = paymentDetails.id;
+        console.log("Payment details fetched:", paymentDetails);
 
-          const link = `https://lovezin-three.vercel.app/nossa-historia/${external_reference}`;
+        // Verifica o status do pagamento
+        if (paymentDetails?.status === "approved") {
+          const email = paymentDetails?.payer?.email;
+          const amount = paymentDetails?.transaction_amount;
+          const externalReference = paymentDetails?.external_reference;
 
-          // Send payment confirmation email
+          if (!email || !externalReference) {
+            console.error(
+              "Missing email or external_reference in payment details"
+            );
+            return res.status(400).send("Invalid payment details");
+          }
+
+          // Link da história personalizada
+          const link = `https://lovezin-three.vercel.app/nossa-historia/${externalReference}`;
+
+          // Envia o e-mail de confirmação de pagamento
           await this.emailService.sendPaymentConfirmation(email, amount, link);
 
           console.log(`Payment approved and email sent to ${email} - ${link}`);
         }
       }
 
-      // Return 200 OK to Mercado Pago
+      // Retorna 200 OK para o Mercado Pago
       return res.status(200).send("Webhook processed successfully");
     } catch (error) {
       console.error("Error processing webhook:", error);
