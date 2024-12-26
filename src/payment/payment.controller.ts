@@ -27,23 +27,20 @@ export class PaymentController {
 
   @Post("pix/webhook")
   async handleMercadoPagoNotification(@Body() body: any, @Res() res: any) {
-    const { external_reference, status } = body;
+    const { external_reference, status } = body.data;
 
     try {
       console.log("Webhook received:", body);
 
+      console.log("external_reference", external_reference);
+
       // Check if the notification is about a payment
       if (body.type === "payment") {
-        const paymentId = body.id;
-
-        console.log("paymentId", paymentId);
-        console.log("external_reference", external_reference);
+        const paymentId = body.data.id;
 
         // Fetch payment details from Mercado Pago
         const paymentDetails =
           await this.paymentService.getPaymentDetails(paymentId);
-
-        console.log("paymentDetails", paymentDetails);
 
         if (paymentDetails.status === "pending") {
           // Extract payment details
