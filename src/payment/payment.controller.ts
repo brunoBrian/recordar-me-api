@@ -42,13 +42,13 @@ export class PaymentController {
 
         console.log("Payment details fetched:", paymentDetails);
 
-        // Verifica o status do pagamento
-        if (paymentDetails?.status === "approved") {
-          const email = paymentDetails?.payer?.email;
-          const amount = paymentDetails?.transaction_amount;
-          const externalReference = paymentDetails?.external_reference;
+        const [uuid, email] = paymentDetails?.external_reference.split("|");
 
-          if (!email || !externalReference) {
+        // Verifica o status do pagamento
+        if (paymentDetails?.status === "pending") {
+          const amount = paymentDetails?.transaction_amount;
+
+          if (!email || !uuid) {
             console.error(
               "Missing email or external_reference in payment details"
             );
@@ -56,7 +56,7 @@ export class PaymentController {
           }
 
           // Link da história personalizada
-          const link = `https://lovezin-three.vercel.app/nossa-historia/${externalReference}`;
+          const link = `https://lovezin-three.vercel.app/nossa-historia/${uuid}`;
 
           // Envia o e-mail de confirmação de pagamento
           await this.emailService.sendPaymentConfirmation(email, amount, link);
