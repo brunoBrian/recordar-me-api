@@ -26,8 +26,7 @@ export class PaymentService {
 
   private async createMercadoPagoPixPayment(data: CreatePixPaymentDto) {
     const client = new MercadoPagoConfig({
-      accessToken:
-        "TEST-4040709112330075-122015-a86226fe016fc8bcc2317edd45d21a1b-223439510",
+      accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
     });
     const payment = new Payment(client);
 
@@ -54,8 +53,7 @@ export class PaymentService {
 
   async getPaymentDetails(paymentId: string) {
     const client = new MercadoPagoConfig({
-      accessToken:
-        "TEST-4040709112330075-122015-a86226fe016fc8bcc2317edd45d21a1b-223439510",
+      accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
     });
     const payment = new Payment(client);
 
