@@ -26,7 +26,8 @@ export class EmailService {
     console.log(`Sending payment confirmation to ${email}`);
     console.log(`Amount: R$${amount.toFixed(2)}`);
 
-    const qrCodeImage = await QRCode.toDataURL(link);
+    // Gera o QR Code como Buffer
+    const qrCodeBuffer = await QRCode.toBuffer(link);
 
     await this.transporter.sendMail({
       from: process.env.SMTP_FROM,
@@ -47,13 +48,20 @@ export class EmailService {
         </div>
         <p>Ou, escaneie o QR Code abaixo para acessar:</p>
         <div style="text-align: center;">
-          <img src="${qrCodeImage}" alt="QR Code" style="max-width: 200px; margin: 20px auto;" />
+          <img src="cid:qrcode" alt="QR Code" style="max-width: 200px; margin: 20px auto;" />
         </div>
         <p>Se tiver alguma dúvida, estamos à disposição para ajudar.</p>
         <p>Atenciosamente,</p>
         <p><strong>Recordar.me</strong></p>
       </div>
       `,
+      attachments: [
+        {
+          filename: "qrcode.png",
+          content: qrCodeBuffer,
+          cid: "qrcode", // Referência para usar no src do img
+        },
+      ],
     });
   }
 }
