@@ -45,7 +45,7 @@ export class PaymentController {
         const [uuid, email] = paymentDetails?.external_reference.split("|");
 
         // Verifica o status do pagamento
-        if (paymentDetails?.status === "approved") {
+        if (paymentDetails?.status === "pending") {
           const amount = paymentDetails?.transaction_amount;
 
           if (!email || !uuid) {
