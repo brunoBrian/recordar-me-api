@@ -40,8 +40,6 @@ export class PaymentController {
         const paymentDetails =
           await this.paymentService.getPaymentDetails(paymentId);
 
-        console.log("Payment details fetched:", paymentDetails);
-
         const [uuid, email] = paymentDetails?.external_reference.split("|");
 
         // Verifica o status do pagamento

@@ -1,12 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import * as QRCode from "qrcode";
 import { Payment, MercadoPagoConfig } from "mercadopago";
-import { EmailService } from "../shared/services/email.service";
 import { CreatePixPaymentDto } from "./dto/create-pix-payment.dto";
 
 @Injectable()
 export class PaymentService {
-  constructor(private readonly emailService: EmailService) {}
+  constructor() {}
 
   async createPixPayment(createPixPaymentDto: CreatePixPaymentDto) {
     const payment = await this.createMercadoPagoPixPayment(createPixPaymentDto);
