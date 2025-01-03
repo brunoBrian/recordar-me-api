@@ -54,7 +54,7 @@ export class PaymentController {
           }
 
           // Link da história personalizada
-          const link = `https://lovezin-three.vercel.app/nossa-historia/${uuid}`;
+          const link = `https://recordarme.com.br/nossa-historia/${uuid}`;
 
           // Envia o e-mail de confirmação de pagamento
           await this.emailService.sendPaymentConfirmation(email, amount, link);
