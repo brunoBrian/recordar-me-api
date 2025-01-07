@@ -27,9 +27,14 @@ export class PaymentService {
   }
 
   private async createMercadoPagoPixPayment(data: CreatePixPaymentDto) {
+    const isProduction = process.env.NODE_ENV === "production";
+
     const client = new MercadoPagoConfig({
-      accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
+      accessToken: isProduction
+        ? process.env.MERCADO_PAGO_ACCESS_TOKEN_PROD
+        : process.env.MERCADO_PAGO_ACCESS_TOKEN_TEST,
     });
+
     const payment = new Payment(client);
 
     try {
@@ -54,9 +59,14 @@ export class PaymentService {
   }
 
   async getPaymentDetails(paymentId: string) {
+    const isProduction = process.env.NODE_ENV === "production";
+
     const client = new MercadoPagoConfig({
-      accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
+      accessToken: isProduction
+        ? process.env.MERCADO_PAGO_ACCESS_TOKEN_PROD
+        : process.env.MERCADO_PAGO_ACCESS_TOKEN_TEST,
     });
+
     const payment = new Payment(client);
 
     try {
