@@ -40,7 +40,8 @@ export class PaymentService {
     try {
       const response = await payment.create({
         body: {
-          transaction_amount: data.amount,
+          transaction_amount: 0.01,
+          // transaction_amount: data.amount,
           description: data.description,
           payment_method_id: "pix",
           external_reference: `${data.uuid}|${data.email}|${data.phone}`,
