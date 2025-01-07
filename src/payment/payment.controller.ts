@@ -5,6 +5,8 @@ import {
   Res,
   HttpException,
   HttpStatus,
+  Get,
+  Param,
 } from "@nestjs/common";
 import { PaymentService } from "./payment.service";
 import { CreatePixPaymentDto } from "./dto/create-pix-payment.dto";
@@ -69,6 +71,34 @@ export class PaymentController {
       console.error("Error processing webhook:", error);
       throw new HttpException(
         "Error processing webhook",
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get("check/:id")
+  @ApiOperation({ summary: "Check if a QR Code payment has been made" })
+  async handleCheckPayment(@Param("id") id: string, @Res() res: any) {
+    try {
+      const paymentDetails = await this.paymentService.getPaymentDetails(id);
+
+      if (!paymentDetails) {
+        return res.status(404).send("Payment not found");
+      }
+
+      const status = paymentDetails.status;
+
+      if (status === "approved") {
+        return res.status(200).send({ message: "Payment approved", status });
+      } else if (status === "pending") {
+        return res.status(200).send({ message: "Payment pending", status });
+      } else {
+        return res.status(200).send({ message: "Payment status", status });
+      }
+    } catch (error) {
+      console.error("Error checking payment status:", error);
+      throw new HttpException(
+        "Error checking payment status",
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
