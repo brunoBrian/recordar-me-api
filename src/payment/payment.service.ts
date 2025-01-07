@@ -14,7 +14,10 @@ export class PaymentService {
       payment.point_of_interaction.transaction_data.qr_code
     );
 
+    console.log(payment);
+
     return {
+      payment_id: payment.id,
       qrCode,
       pixKey: payment.point_of_interaction.transaction_data.qr_code,
       pixKeyBase64:
