@@ -24,7 +24,6 @@ export class EmailService {
     link: string
   ): Promise<void> {
     console.log(`Sending payment confirmation to ${email}`);
-    console.log(`Amount: R$${amount.toFixed(2)}`);
 
     // Gera o QR Code como Buffer
     const qrCodeBuffer = await QRCode.toBuffer(link);

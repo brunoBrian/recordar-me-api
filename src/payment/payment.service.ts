@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import * as QRCode from "qrcode";
 import { Payment, MercadoPagoConfig } from "mercadopago";
 import { CreatePixPaymentDto } from "./dto/create-pix-payment.dto";
+import console from "console";
 
 @Injectable()
 export class PaymentService {
@@ -14,7 +15,10 @@ export class PaymentService {
       payment.point_of_interaction.transaction_data.qr_code
     );
 
-    console.log(payment);
+    console.log(`qrcode created to: ${createPixPaymentDto.email}`);
+    console.log(
+      `payment id: ${payment.id}, payment data: ${payment.point_of_interaction}`
+    );
 
     return {
       payment_id: payment.id,
@@ -36,6 +40,8 @@ export class PaymentService {
     });
 
     const payment = new Payment(client);
+
+    console.log(`creating qrcode to: ${data.email}`);
 
     try {
       const response = await payment.create({
@@ -72,6 +78,7 @@ export class PaymentService {
 
     try {
       const response = await payment.get({ id: paymentId });
+
       return response;
     } catch (error) {
       console.error("Error fetching payment details:", error);

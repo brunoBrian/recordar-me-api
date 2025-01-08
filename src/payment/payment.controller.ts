@@ -79,6 +79,8 @@ export class PaymentController {
   @Get("check/:id")
   @ApiOperation({ summary: "Check if a QR Code payment has been made" })
   async handleCheckPayment(@Param("id") id: string, @Res() res: any) {
+    console.log("Checking payment status for ID:", id);
+
     try {
       const paymentDetails = await this.paymentService.getPaymentDetails(id);
 
@@ -87,6 +89,8 @@ export class PaymentController {
       }
 
       const status = paymentDetails.status;
+
+      console.log(`Status for payment ID: ${id} is ${status}`);
 
       if (status === "approved") {
         return res.status(200).send({ message: "Payment approved", status });

@@ -43,6 +43,11 @@ export class StoryService {
     };
 
     await this.firebaseService.create("stories", uuid, storyData);
+
+    console.log(
+      `Story created successfully to uuid ${uuid} with data: ${JSON.stringify(storyData)}`
+    );
+
     return { uuid };
   }
 
