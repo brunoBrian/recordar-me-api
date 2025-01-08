@@ -5,7 +5,7 @@ import { Module } from "@nestjs/common";
   imports: [
     MulterModule.register({
       limits: {
-        fileSize: 5 * 1024 * 1024, // Limite de 5 MB por arquivo
+        fileSize: 50 * 1024 * 1024, // 50 MB
       },
       fileFilter: (req, file, callback) => {
         if (!file.mimetype.startsWith("image/")) {
