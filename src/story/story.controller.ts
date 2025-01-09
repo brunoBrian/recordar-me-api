@@ -6,61 +6,48 @@ import {
   UseInterceptors,
   Get,
   Param,
+  UploadedFile,
 } from "@nestjs/common";
-import { FileFieldsInterceptor } from "@nestjs/platform-express";
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from "@nestjs/platform-express";
 import { CreateStoryDto } from "./dto/create-story.dto";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { StoryService } from "./story.service";
+import { StorageService } from "src/shared/services/storage.service";
+import { File } from "buffer";
 
 @ApiTags("stories")
 @Controller("story")
 export class StoryController {
-  constructor(private readonly storyService: StoryService) {}
+  constructor(
+    private readonly storyService: StoryService,
+    private readonly storageService: StorageService
+  ) {}
 
   @Post()
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: "storyImages", maxCount: 5 }, // Ajuste conforme necessário
-      { name: "specialMoments[0][photoFile]", maxCount: 1 }, // Para arquivos específicos
-      { name: "specialMoments[1][photoFile]", maxCount: 1 }, // Repetir para cada índice
-      { name: "specialMoments[2][photoFile]", maxCount: 1 }, // Repetir para cada índice
-      { name: "specialMoments[3][photoFile]", maxCount: 1 }, // Repetir para cada índice
-      { name: "specialMoments[4][photoFile]", maxCount: 1 }, // Repetir para cada índice
-    ])
-  )
   @ApiOperation({ summary: "Create a new story with images" })
-  async createStory(
-    @Body() createStoryDto: CreateStoryDto,
-    @UploadedFiles() files: Record<string, File[]>
-  ) {
-    // Lógica para mapear arquivos aos momentos
-    const specialMoments = createStoryDto?.specialMoments?.map(
-      (moment, index) => {
-        const parseMoment =
-          typeof moment === "string" ? JSON.parse(moment) : moment;
+  async createStory(@Body() createStoryDto: CreateStoryDto) {
+    console.log(createStoryDto);
 
-        return {
-          id: parseMoment.id,
-          title: parseMoment.title,
-          date: parseMoment.date,
-          description: parseMoment.description,
-          photoFile: files[`specialMoments[${index}][photoFile]`]?.[0], // Associa o arquivo ao momento
-        };
-      }
-    );
-
-    const payload = {
-      ...createStoryDto,
-      storyImages: files.storyImages,
-      specialMoments,
-    };
-
-    return this.storyService.createStory(payload);
+    return this.storyService.createStory(createStoryDto);
   }
 
   @Get(":uuid")
   @ApiOperation({ summary: "Get story by UUID" })
   async getStory(@Param("uuid") uuid: string) {
     return this.storyService.getStory(uuid);
+  }
+
+  @Post("/upload/image")
+  @UseInterceptors(FileInterceptor("file"))
+  async uploadFile(@UploadedFile() file: File) {
+    console.log(`Fazendo upload`);
+    const uploadedUrl = await this.storageService.uploadFile(file);
+
+    console.log(`Upload url: ${uploadedUrl}`);
+
+    return { url: uploadedUrl };
   }
 }

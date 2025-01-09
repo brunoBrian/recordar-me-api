@@ -13,11 +13,6 @@ export class StoryService {
 
   async createStory(createStoryDto: CreateStoryDto) {
     const uuid = uuidv4();
-    const imageUrls = await Promise.all(
-      createStoryDto?.storyImages?.map((image) =>
-        this.storageService.uploadFile(image)
-      )
-    );
 
     const specialMomentsWithUrls = createStoryDto.specialMoments
       ? await Promise.all(
@@ -36,9 +31,8 @@ export class StoryService {
 
     const storyData = {
       ...createStoryDto,
-      storyImages: imageUrls,
-      specialMoments: specialMomentsWithUrls,
       uuid,
+      specialMoments: specialMomentsWithUrls,
       createdAt: new Date().toISOString(),
     };
 

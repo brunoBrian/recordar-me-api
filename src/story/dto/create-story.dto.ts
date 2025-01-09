@@ -1,13 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import {
-  IsArray,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 class SpecialMomentDto {
   @ApiProperty()
@@ -22,9 +14,9 @@ class SpecialMomentDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ type: "string", format: "binary" }) // Indica que será um arquivo
+  @ApiProperty({ type: "string" })
   @IsNotEmpty()
-  photoFile?: any; // Aceita o arquivo
+  photoFile?: string;
 }
 
 export class CreateStoryDto {
@@ -59,11 +51,10 @@ export class CreateStoryDto {
 
   @ApiProperty({
     type: "string",
-    format: "binary",
     required: false,
     isArray: true,
   })
-  storyImages?: any[];
+  storyImages?: string[];
 
   @ApiProperty({ type: [SpecialMomentDto], required: false })
   specialMoments?: SpecialMomentDto[];
