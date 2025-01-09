@@ -29,8 +29,6 @@ export class StoryController {
   @Post()
   @ApiOperation({ summary: "Create a new story with images" })
   async createStory(@Body() createStoryDto: CreateStoryDto) {
-    console.log(createStoryDto);
-
     return this.storyService.createStory(createStoryDto);
   }
 

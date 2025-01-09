@@ -6,33 +6,14 @@ import { CreateStoryDto } from "./dto/create-story.dto";
 
 @Injectable()
 export class StoryService {
-  constructor(
-    private readonly firebaseService: FirebaseService,
-    private readonly storageService: StorageService
-  ) {}
+  constructor(private readonly firebaseService: FirebaseService) {}
 
   async createStory(createStoryDto: CreateStoryDto) {
     const uuid = uuidv4();
 
-    const specialMomentsWithUrls = createStoryDto.specialMoments
-      ? await Promise.all(
-          createStoryDto.specialMoments.map(async (moment) => {
-            const uploadedPhotoUrl = moment.photoFile
-              ? await this.storageService.uploadFile(moment.photoFile)
-              : null;
-
-            return {
-              ...moment,
-              photo: uploadedPhotoUrl,
-            };
-          })
-        )
-      : [];
-
     const storyData = {
       ...createStoryDto,
       uuid,
-      specialMoments: specialMomentsWithUrls,
       createdAt: new Date().toISOString(),
     };
 
