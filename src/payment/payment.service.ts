@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import * as QRCode from "qrcode";
 import { Payment, MercadoPagoConfig } from "mercadopago";
 import { CreatePixPaymentDto } from "./dto/create-pix-payment.dto";
-import console from "console";
 
 @Injectable()
 export class PaymentService {
@@ -30,7 +29,9 @@ export class PaymentService {
     };
   }
 
-  private async createMercadoPagoPixPayment(data: CreatePixPaymentDto) {
+  private async createMercadoPagoPixPayment(
+    createPixBody: CreatePixPaymentDto
+  ) {
     const isProduction = process.env.NODE_ENV === "production";
 
     const client = new MercadoPagoConfig({
@@ -39,20 +40,22 @@ export class PaymentService {
         : process.env.MERCADO_PAGO_ACCESS_TOKEN_TEST,
     });
 
+    console.log("createPixBody", createPixBody);
+
     const payment = new Payment(client);
 
-    console.log(`creating qrcode to: ${data.email}`);
+    console.log(`creating qrcode to: ${createPixBody?.email}`);
 
     try {
       const response = await payment.create({
         body: {
           transaction_amount: 0.01,
           // transaction_amount: data.amount,
-          description: data.description,
+          description: createPixBody.description,
           payment_method_id: "pix",
-          external_reference: `${data.uuid}|${data.email}|${data.phone}`,
+          external_reference: `${createPixBody.uuid}|${createPixBody.email}|${createPixBody.phone}`,
           payer: {
-            email: data.email,
+            email: createPixBody.email,
           },
         },
       });
