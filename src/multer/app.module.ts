@@ -4,6 +4,7 @@ import { Module } from "@nestjs/common";
 @Module({
   imports: [
     MulterModule.register({
+      dest: "./uploads",
       limits: {
         fileSize: 50 * 1024 * 1024, // 50 MB
       },
