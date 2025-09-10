@@ -9,14 +9,13 @@ import {
   UploadedFile,
 } from "@nestjs/common";
 import {
-  FileFieldsInterceptor,
+  AnyFilesInterceptor,
   FileInterceptor,
 } from "@nestjs/platform-express";
 import { CreateStoryDto } from "./dto/create-story.dto";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { StoryService } from "./story.service";
 import { StorageService } from "src/shared/services/storage.service";
-import { File } from "buffer";
 
 @ApiTags("stories")
 @Controller("story")
@@ -28,8 +27,12 @@ export class StoryController {
 
   @Post()
   @ApiOperation({ summary: "Create a new story with images" })
-  async createStory(@Body() createStoryDto: CreateStoryDto) {
-    return this.storyService.createStory(createStoryDto);
+  @UseInterceptors(AnyFilesInterceptor())
+  async createStory(
+    @Body() createStoryDto: CreateStoryDto,
+    @UploadedFiles() files: Array<Express.Multer.File>
+  ) {
+    return this.storyService.createStory(createStoryDto, files);
   }
 
   @Get(":uuid")
@@ -40,7 +43,7 @@ export class StoryController {
 
   @Post("/upload/image")
   @UseInterceptors(FileInterceptor("file"))
-  async uploadFile(@UploadedFile() file: File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log(`Fazendo upload`);
     const uploadedUrl = await this.storageService.uploadFile(file);
 
