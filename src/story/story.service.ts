@@ -8,74 +8,93 @@ import { CreateStoryDto } from "./dto/create-story.dto";
 export class StoryService {
   constructor(
     private readonly firebaseService: FirebaseService,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
   ) {}
 
   async createStory(
     createStoryDto: CreateStoryDto,
-    files: Array<Express.Multer.File>
+    files: Array<Express.Multer.File>,
   ) {
+    const pLimit = require("p-limit");
+    const limit = pLimit(5); // Limit to 5 concurrent uploads
+
     console.log("--- Inside createStory service method ---");
-    console.log(
-      "Received createStoryDto:",
-      JSON.stringify(createStoryDto, null, 2)
-    );
     console.log(`Received ${files ? files.length : 0} files.`);
-    if (files) {
-      files.forEach((file, index) => {
-        console.log(
-          `File #${index}: fieldname='${file.fieldname}', originalname='${file.originalname}', size=${file.size}`
-        );
-      });
+
+    // Parse specialMoments if they are strings (coming from FormData as JSON strings)
+    if (
+      createStoryDto.specialMoments &&
+      Array.isArray(createStoryDto.specialMoments)
+    ) {
+      createStoryDto.specialMoments = createStoryDto.specialMoments.map(
+        (moment) => {
+          if (typeof moment === "string") {
+            try {
+              return JSON.parse(moment);
+            } catch (e) {
+              console.error("Error parsing specialMoment:", e);
+              return moment;
+            }
+          }
+          return moment;
+        },
+      );
     }
-    console.log("-----------------------------------------");
 
     const uuid = uuidv4();
 
     if (files) {
       const storyImageFiles = files.filter(
-        (f) => f.fieldname === "storyImages"
+        (f) => f.fieldname === "storyImages",
       );
       if (storyImageFiles.length > 0) {
-        console.log("Uploading story images...");
+        console.log("Uploading story images with concurrency limit...");
         const storyImageUrls = await Promise.all(
-          storyImageFiles.map((file) => this.storageService.uploadFile(file))
+          storyImageFiles.map((file) =>
+            limit(() => this.storageService.uploadFile(file)),
+          ),
         );
         createStoryDto.storyImages = storyImageUrls;
         console.log("Story images uploaded.");
       }
 
       const specialMomentFiles = files.filter((f) =>
-        f.fieldname.startsWith("specialMoments")
+        f.fieldname.startsWith("specialMoments"),
       );
 
       if (specialMomentFiles.length > 0) {
         console.log("Uploading special moment photos...");
-        for (const file of specialMomentFiles) {
-          const match = file.fieldname.match(
-            /specialMoments\[(\d+)\]\[photoFile\]/
-          );
-          if (match) {
-            const index = parseInt(match[1], 10);
-            if (
-              createStoryDto.specialMoments &&
-              createStoryDto.specialMoments[index]
-            ) {
-              console.log(`Uploading photo for special moment #${index}...`);
-              const url = await this.storageService.uploadFile(file);
-              createStoryDto.specialMoments[index].photoFile = url;
-              console.log(
-                `Photo for special moment #${index} uploaded to ${url}.`
-              );
+
+        // Map uploads to promises with concurrency limit
+        const uploadPromises = specialMomentFiles.map((file) =>
+          limit(async () => {
+            const match = file.fieldname.match(
+              /specialMoments\[(\d+)\]\[photoFile\]/,
+            );
+            if (match) {
+              const index = parseInt(match[1], 10);
+              if (
+                createStoryDto.specialMoments &&
+                createStoryDto.specialMoments[index]
+              ) {
+                console.log(`Uploading photo for special moment #${index}...`);
+                const url = await this.storageService.uploadFile(file);
+                createStoryDto.specialMoments[index].photoFile = url;
+                console.log(
+                  `Photo for special moment #${index} uploaded to ${url}.`,
+                );
+              }
             }
-          }
-        }
+          }),
+        );
+
+        await Promise.all(uploadPromises);
         console.log("Special moment photos uploaded.");
       }
     }
 
     console.log(
-      "--- All uploads finished. Preparing to save to Firestore. ---"
+      "--- All uploads finished. Preparing to save to Firestore. ---",
     );
 
     const storyData = {
@@ -90,7 +109,7 @@ export class StoryService {
     if (payloadSize > 1048576) {
       // 1 MiB limit for Firestore documents
       console.error(
-        "Error: Firestore payload is larger than 1 MiB. This will likely fail."
+        "Error: Firestore payload is larger than 1 MiB. This will likely fail.",
       );
     }
 
@@ -100,8 +119,8 @@ export class StoryService {
 
     console.log(
       `Story created successfully to uuid ${uuid} with data: ${JSON.stringify(
-        storyData
-      )}`
+        storyData,
+      )}`,
     );
 
     return { uuid };

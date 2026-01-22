@@ -13,14 +13,34 @@ export class StorageService {
   async uploadFile(file: any): Promise<string> {
     const fileName = `${uuidv4()}-${file.originalname}`;
     const bucket = this.storage.bucket();
-    const fileBuffer = file.buffer;
 
     const fileRef = bucket.file(fileName);
-    await fileRef.save(fileBuffer, {
-      metadata: {
-        contentType: file.mimetype,
-      },
-    });
+
+    if (file.path) {
+      // Upload from disk (Multer DiskStorage)
+      await bucket.upload(file.path, {
+        destination: fileName,
+        metadata: {
+          contentType: file.mimetype,
+        },
+      });
+
+      // Clean up local temp file
+      const fs = require("fs");
+      try {
+        fs.unlinkSync(file.path);
+      } catch (err) {
+        console.error("Error deleting temp file:", err);
+      }
+    } else {
+      // Upload from buffer (Multer MemoryStorage fallback)
+      const fileBuffer = file.buffer;
+      await fileRef.save(fileBuffer, {
+        metadata: {
+          contentType: file.mimetype,
+        },
+      });
+    }
 
     // Get public URL
     await fileRef.makePublic();
