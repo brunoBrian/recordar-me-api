@@ -20,6 +20,53 @@ export class StoryService {
 
     console.log("--- Inside createStory service method ---");
     console.log(`Received ${files ? files.length : 0} files.`);
+    console.log(
+      "DTO Received - storyImages:",
+      JSON.stringify(createStoryDto.storyImages),
+    );
+    console.log(
+      "DTO Received - specialMoments:",
+      JSON.stringify(createStoryDto.specialMoments),
+    );
+
+    // Verify if storyImages is a string (single upload) and convert to array
+    if (
+      createStoryDto.storyImages &&
+      typeof createStoryDto.storyImages === "string"
+    ) {
+      createStoryDto.storyImages = [createStoryDto.storyImages];
+    }
+
+    // Verify if specialMoments is a string (single upload in FormData) and convert to array
+    // Note: If it comes as JSON string "[...]" it's different, but Multer usually parses multiple fields
+    // If it's a single field 'specialMoments' with value '{"...json..."}', it comes as string.
+    if (
+      createStoryDto.specialMoments &&
+      typeof createStoryDto.specialMoments === "string"
+    ) {
+      // Check if it's a JSON array string or a single JSON object string
+      try {
+        const parsed = JSON.parse(
+          createStoryDto.specialMoments as unknown as string,
+        );
+        if (Array.isArray(parsed)) {
+          createStoryDto.specialMoments = parsed;
+        } else {
+          createStoryDto.specialMoments = [parsed]; // Or [createStoryDto.specialMoments] if we want to parse later
+          // But wait, the existing logic parses later.
+          // Let's just wrap in array if it's a single entry string that represents one moment object.
+          // Actually the existing logic:
+          // if (typeof moment === "string") JSON.parse(moment)
+          // This iterates over an ARRAY.
+          // So if createStoryDto.specialMoments IS A STRING, we make it an array of strings.
+          createStoryDto.specialMoments = [
+            createStoryDto.specialMoments,
+          ] as any;
+        }
+      } catch (e) {
+        createStoryDto.specialMoments = [createStoryDto.specialMoments] as any;
+      }
+    }
 
     // Parse specialMoments if they are strings (coming from FormData as JSON strings)
     if (

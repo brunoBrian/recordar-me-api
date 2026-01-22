@@ -54,7 +54,8 @@ export class CreateStoryDto {
     required: false,
     isArray: true,
   })
-  storyImages?: string[];
+  @IsOptional()
+  storyImages?: string[] | string;
 
   @ApiProperty({ type: [SpecialMomentDto], required: false })
   specialMoments?: SpecialMomentDto[];
