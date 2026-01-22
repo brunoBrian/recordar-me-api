@@ -26,19 +26,31 @@ export class StoryService {
       createStoryDto.specialMoments &&
       Array.isArray(createStoryDto.specialMoments)
     ) {
-      createStoryDto.specialMoments = createStoryDto.specialMoments.map(
-        (moment) => {
-          if (typeof moment === "string") {
-            try {
-              return JSON.parse(moment);
-            } catch (e) {
-              console.error("Error parsing specialMoment:", e);
-              return moment;
-            }
+      // 1. Parse strings to objects
+      let parsedMoments = createStoryDto.specialMoments.map((moment) => {
+        if (typeof moment === "string") {
+          try {
+            return JSON.parse(moment);
+          } catch (e) {
+            console.error("Error parsing specialMoment:", e);
+            return moment;
           }
-          return moment;
-        },
-      );
+        }
+        return moment;
+      });
+
+      // 2. Deduplicate based on content (title, date, description) to avoid multiple FormData entries causing duplicates
+      const seen = new Set();
+      parsedMoments = parsedMoments.filter((moment) => {
+        const key = `${moment.title}-${moment.date}-${moment.description}`;
+        if (seen.has(key)) {
+          return false;
+        }
+        seen.add(key);
+        return true;
+      });
+
+      createStoryDto.specialMoments = parsedMoments;
     }
 
     const uuid = uuidv4();
